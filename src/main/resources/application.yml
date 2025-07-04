@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: exception-handler
+  datasource:
+    url: jdbc:mysql://localhost:3306/exception_handler
+    username: root
+    password: admin
+  jpa:
+    hibernate:
+      ddl-auto: update  
