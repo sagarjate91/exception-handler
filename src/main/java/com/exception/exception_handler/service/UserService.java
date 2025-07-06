@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.exception.exception_handler.dto.UserDto;
 import com.exception.exception_handler.model.User;
 import com.exception.exception_handler.repository.UserRepository;
+import com.exception.utility.Utility;
 
 @Service
 public class UserService {
@@ -14,22 +16,24 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(Utility::userToUserDto)
+                .toList();
     }
 
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElse(null);
+    public UserDto getUserById(Long id) {
+        return Utility.userToUserDto(userRepository.findById(id).orElse(null));
     }
 
-    public User createUser(User user) {
-        return userRepository.save(user);
+    public UserDto createUser(UserDto user) {
+        return Utility.userToUserDto(userRepository.save(Utility.userDtoToUser(user)));
     }
 
-    public User updateUser(Long id, User user) {
+    public UserDto updateUser(Long id, UserDto user) {
         if (userRepository.existsById(id)) {
             user.setId(id);
-            return userRepository.save(user);
+            return Utility.userToUserDto(userRepository.save(Utility.userDtoToUser(user)));
         }
         return null;
     }
@@ -37,7 +41,8 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
-    public User partialUpdateUser(Long id, User user) {
+
+    public UserDto partialUpdateUser(Long id, UserDto user) {
         User existingUser = userRepository.findById(id).orElse(null);
         if (existingUser != null) {
             if (user.getName() != null) {
@@ -58,7 +63,7 @@ public class UserService {
             if (user.getAddress() != null) {
                 existingUser.setAddress(user.getAddress());
             }
-            return userRepository.save(existingUser);
+            return Utility.userToUserDto(userRepository.save(existingUser));
         }
         return null;
     }
